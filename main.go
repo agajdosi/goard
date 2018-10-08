@@ -1,22 +1,18 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
+)
 
-	"gopkg.in/yaml.v2"
+var (
+	config conf
 )
 
 func main() {
-	var configPath string
-	flag.StringVar(&configPath, "config-path", "test/config.yaml", "Path to the config")
-	flag.Parse()
-
-	var config conf
+	getFlags()
 	config.getConf(configPath)
 
 	for _, file := range config.Files {
@@ -27,26 +23,6 @@ func main() {
 		}
 		fmt.Println(same)
 	}
-}
-
-type conf struct {
-	Files []struct {
-		This string `yaml:"this"`
-		That string `yaml:"that"`
-	} `yaml:"files"`
-}
-
-func (c *conf) getConf(configPath string) *conf {
-	yamlFile, err := ioutil.ReadFile(configPath)
-	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
-	}
-	err = yaml.Unmarshal(yamlFile, c)
-	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
-	}
-
-	return c
 }
 
 func checkFiles(pathOne, pathTwo string) (bool, error) {
