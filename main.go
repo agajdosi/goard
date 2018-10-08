@@ -1,21 +1,52 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
+
+	"gopkg.in/yaml.v2"
 )
 
 func main() {
-	result, _ := checkFiles("test/eap71-basic-s2i.json", "https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json")
-	fmt.Println(result)
+	var configPath string
+	flag.StringVar(&configPath, "config-path", "test/config.yaml", "Path to the config")
+	flag.Parse()
 
-	result, _ = checkFiles("https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json", "test/eap71-basic-s2i.json")
-	fmt.Println(result)
+	var config conf
+	config.getConf(configPath)
 
-	result, _ = checkFiles("test/eap71-basic-s2i-wrong.json", "https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json")
-	fmt.Println(result)
+	for _, file := range config.Files {
+		same, err := checkFiles(file.This, file.That)
+		if err != nil {
+			fmt.Println("error occured:", err)
+			continue
+		}
+		fmt.Println(same)
+	}
+}
+
+type conf struct {
+	Files []struct {
+		This string `yaml:"this"`
+		That string `yaml:"that"`
+	} `yaml:"files"`
+}
+
+func (c *conf) getConf(configPath string) *conf {
+	yamlFile, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+
+	return c
 }
 
 func checkFiles(pathOne, pathTwo string) (bool, error) {
