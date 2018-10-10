@@ -1,12 +1,19 @@
+locations:
+- location:
+  - https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates
+  - https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates
+  files:
+    - eap71-basic-s2i.json
+
 directories:
-- dir: ["test/files", "https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates"]
-  files:
-    - eap71-basic-s2i.json
-- dir: ["test/files/", "https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/"]
-  files:
-    - eap71-basic-s2i.json
+- dir:
+  - test/xpaas/v3.10/xpaas-streams
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.10/roles/openshift_examples/files/examples/v3.10/xpaas-streams
+- dir:
+  - test/xpaas/v3.10/xpaas-templates
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.10/roles/openshift_examples/files/examples/v3.10/xpaas-templates
+
 files:
-- this: test/files/eap71-basic-s2i.json
+- this: test/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
   that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
-- this: test/files/eap71-basic-s2i.json
-  that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
+

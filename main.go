@@ -17,7 +17,7 @@ func main() {
 	getFlags()
 	config.getConf(configPath)
 
-	fmt.Println("Checking individualy defined files...")
+	fmt.Println("Checking individualy defined files")
 	for _, file := range config.Files {
 		same, err := checkFiles(file.This, file.That)
 		if err != nil {
@@ -29,11 +29,11 @@ func main() {
 		}
 	}
 
-	fmt.Println("Checking files in directories...")
-	for _, dir := range config.Directories {
+	fmt.Println("Checking files at remote places")
+	for _, dir := range config.Locations {
 		for _, file := range dir.Files {
-			this := joinPaths(dir.Dir[0], file)
-			that := joinPaths(dir.Dir[1], file)
+			this := joinPaths(dir.Location[0], file)
+			that := joinPaths(dir.Location[1], file)
 			same, err := checkFiles(this, that)
 			if err != nil {
 				log.Fatalf("error checking the files '%v', '%v': %v", this, that, err)
@@ -44,6 +44,32 @@ func main() {
 			}
 		}
 	}
+
+	fmt.Println("Checking files in local directories")
+	for _, directory := range config.Directories {
+		contents, err := ioutil.ReadDir(directory.Dir[0])
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, content := range contents {
+			if content.IsDir() {
+				continue
+			}
+			this := joinPaths(directory.Dir[0], content.Name())
+			that := joinPaths(directory.Dir[1], content.Name())
+			same, err := checkFiles(this, that)
+			if err != nil {
+				log.Fatalf("error checking the files '%v', '%v': %v", this, that, err)
+				continue
+			}
+			if same != true {
+				fmt.Printf("mismatch: '%v', '%v'\n", this, that)
+			}
+		}
+	}
+	fmt.Println()
+
+	fmt.Println("All checks finished")
 }
 
 func checkFiles(pathOne, pathTwo string) (bool, error) {

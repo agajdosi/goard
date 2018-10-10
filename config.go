@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -10,9 +9,14 @@ import (
 
 type conf struct {
 	Directories []struct {
-		Dir   []string `yaml:"dir"`
-		Files []string `yaml:"files"`
+		Dir []string `yaml:"dir"`
+	} `yaml:"directories"`
+
+	Locations []struct {
+		Location []string `yaml:"location"`
+		Files    []string `yaml:"files"`
 	}
+
 	Files []struct {
 		This string `yaml:"this"`
 		That string `yaml:"that"`
@@ -28,9 +32,6 @@ func (c *conf) getConf(configPath string) *conf {
 	if err != nil {
 		log.Fatalf("Unmarshal: %v", err)
 	}
-
-	fmt.Println(c.Directories)
-	fmt.Println(c.Files)
 
 	return c
 }
