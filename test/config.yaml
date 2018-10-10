@@ -1,9 +1,12 @@
+directories:
+- dir: ["test/files", "https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates"]
+  files:
+    - eap71-basic-s2i.json
+- dir: ["test/files/", "https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/"]
+  files:
+    - eap71-basic-s2i.json
 files:
-  - this: test/files/eap71-basic-s2i.json
-    that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
-  - this: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
-    that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
-  - this: test/files/eap71-basic-s2i.json
-    that: test/files/eap72-basic-s2i-wrong.json
-  - this: test/files/eap72-basic-s2i-wrong.json
-    that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
+- this: test/files/eap71-basic-s2i.json
+  that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json
+- this: test/files/eap71-basic-s2i.json
+  that: https://raw.githubusercontent.com/minishift/minishift/master/addons/xpaas/v3.10/xpaas-templates/eap71-basic-s2i.json

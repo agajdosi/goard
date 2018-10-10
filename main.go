@@ -3,8 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
+	"path"
 )
 
 var (
@@ -15,13 +17,32 @@ func main() {
 	getFlags()
 	config.getConf(configPath)
 
+	fmt.Println("Checking individualy defined files...")
 	for _, file := range config.Files {
 		same, err := checkFiles(file.This, file.That)
 		if err != nil {
-			fmt.Println("error occured:", err)
+			log.Fatalf("error checking the files '%v', '%v': %v", file.This, file.That, err)
 			continue
 		}
-		fmt.Println(same)
+		if same != true {
+			log.Fatalf("files mismatch: '%v', '%v'\n", file.This, file.That)
+		}
+	}
+
+	fmt.Println("Checking files in directories...")
+	for _, dir := range config.Directories {
+		for _, file := range dir.Files {
+			this := joinPaths(dir.Dir[0], file)
+			that := joinPaths(dir.Dir[1], file)
+			same, err := checkFiles(this, that)
+			if err != nil {
+				log.Fatalf("error checking the files '%v', '%v': %v", this, that, err)
+				continue
+			}
+			if same != true {
+				log.Fatalf("files mismatch: '%v', '%v'\n", this, that)
+			}
+		}
 	}
 }
 
@@ -69,7 +90,6 @@ func downloadFile(url string) (string, error) {
 	if resp.StatusCode != http.StatusOK {
 		return "", fmt.Errorf("error getting the file")
 	}
-
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
@@ -85,4 +105,24 @@ func readFile(path string) (string, error) {
 	}
 
 	return string(remoteFile), nil
+}
+
+func joinPaths(first string, second string) string {
+	var result string
+	firstURL, err := url.Parse(first)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	switch firstURL.Scheme {
+	case "http", "https":
+		firstURL.Path = path.Join(firstURL.Path, second)
+		result = firstURL.String()
+	case "", "file":
+		result = path.Join(first, second)
+	default:
+		log.Fatalf("unable to match the path '%v' to http(s):// or file:// schemes", first)
+	}
+
+	return result
 }
