@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 )
 
@@ -15,6 +16,7 @@ var (
 
 func main() {
 	getFlags()
+	setWorkdir()
 	config.getConf(configPath)
 
 	fmt.Println("Checking individualy defined files")
@@ -151,4 +153,16 @@ func joinPaths(first string, second string) string {
 	}
 
 	return result
+}
+
+func setWorkdir() {
+	if workDir != "" {
+		err := os.Chdir(workDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		wd, _ := os.Getwd()
+		fmt.Printf("Working directory set to: %v\n", wd)
+	}
 }

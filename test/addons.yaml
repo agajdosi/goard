@@ -1,0 +1,19 @@
+directories:
+# TO TRY: go run *.go -work-dir=$GOPATH -config-path $GOPATH/src/github.com/agajdosi/goard/test/addons.yaml
+# eap-cd addon
+- dir:
+  - src/github.com/minishift/minishift-addons/add-ons/eap-cd/templates
+  - https://raw.githubusercontent.com/jboss-container-images/jboss-eap-7-openshift-image/eap-cd/templates
+# xpaas addon
+- dir:
+  - src/github.com/minishift/minishift/addons/xpaas/v3.10/xpaas-templates
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.10/roles/openshift_examples/files/examples/v3.10/xpaas-templates
+- dir:
+  - src/github.com/minishift/minishift/addons/xpaas/v3.10/xpaas-streams
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.10/roles/openshift_examples/files/examples/v3.10/xpaas-streams
+- dir:
+  - src/github.com/minishift/minishift/addons/xpaas/v3.9/xpaas-templates
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.9/roles/openshift_examples/files/examples/v3.9/xpaas-templates
+- dir:
+  - src/github.com/minishift/minishift/addons/xpaas/v3.9/xpaas-streams
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.9/roles/openshift_examples/files/examples/v3.9/xpaas-streams
