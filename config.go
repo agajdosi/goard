@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 
 	yaml "gopkg.in/yaml.v2"
 )
@@ -34,4 +36,16 @@ func (c *conf) getConf(configPath string) *conf {
 	}
 
 	return c
+}
+
+func setWorkdir() {
+	if workDir != "" {
+		err := os.Chdir(workDir)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		wd, _ := os.Getwd()
+		fmt.Printf("Working directory set to: %v\n", wd)
+	}
 }

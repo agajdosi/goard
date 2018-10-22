@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -11,7 +12,8 @@ import (
 )
 
 var (
-	config conf
+	config   conf
+	problems bytes.Buffer
 )
 
 func main() {
@@ -19,35 +21,21 @@ func main() {
 	setWorkdir()
 	config.getConf(configPath)
 
-	fmt.Println("Checking individualy defined files")
+	fmt.Print("Checking individualy defined files")
 	for _, file := range config.Files {
-		same, err := checkFiles(file.This, file.That)
-		if err != nil {
-			log.Fatalf("error checking the files '%v', '%v': %v", file.This, file.That, err)
-			continue
-		}
-		if same != true {
-			log.Fatalf("files mismatch: '%v', '%v'\n", file.This, file.That)
-		}
+		checkFiles(file.This, file.That)
 	}
 
-	fmt.Println("Checking files at remote places")
+	fmt.Print("\nChecking files at remote places")
 	for _, dir := range config.Locations {
 		for _, file := range dir.Files {
 			this := joinPaths(dir.Location[0], file)
 			that := joinPaths(dir.Location[1], file)
-			same, err := checkFiles(this, that)
-			if err != nil {
-				log.Fatalf("error checking the files '%v', '%v': %v", this, that, err)
-				continue
-			}
-			if same != true {
-				log.Fatalf("files mismatch: '%v', '%v'\n", this, that)
-			}
+			checkFiles(this, that)
 		}
 	}
 
-	fmt.Println("Checking files in local directories")
+	fmt.Print("\nChecking files in local directories")
 	for _, directory := range config.Directories {
 		contents, err := ioutil.ReadDir(directory.Dir[0])
 		if err != nil {
@@ -59,34 +47,42 @@ func main() {
 			}
 			this := joinPaths(directory.Dir[0], content.Name())
 			that := joinPaths(directory.Dir[1], content.Name())
-			same, err := checkFiles(this, that)
-			if err != nil {
-				log.Fatalf("error checking the files '%v', '%v': %v", this, that, err)
-				continue
-			}
-			if same != true {
-				fmt.Printf("mismatch: '%v', '%v'\n", this, that)
-			}
+			checkFiles(this, that)
 		}
 	}
-	fmt.Println()
 
-	fmt.Println("All checks finished")
+	fmt.Println("\nAll checks finished")
+	if problems.Len() > 0 {
+		fmt.Println("FAIL - problems detected:")
+		fmt.Print(problems.String())
+		os.Exit(1)
+	}
+
+	fmt.Println("OK - all files up-to-date")
+	os.Exit(0)
 }
 
-func checkFiles(pathOne, pathTwo string) (bool, error) {
+func checkFiles(pathOne, pathTwo string) {
 	first, err := getFile(pathOne)
 	if err != nil {
-		return false, err
+		logResult(err)
+		return
 	}
 
 	second, err := getFile(pathTwo)
 	if err != nil {
-		return false, err
+		logResult(err)
+		return
 	}
 
-	equals := first == second
-	return equals, nil
+	if first != second {
+		err := fmt.Errorf("mismatch, file '%v' is not the same as file '%v'", pathOne, pathTwo)
+		logResult(err)
+		return
+	}
+
+	logResult(nil)
+	return
 }
 
 func getFile(path string) (string, error) {
@@ -102,7 +98,7 @@ func getFile(path string) (string, error) {
 	case "", "file":
 		content, err = readFile(path)
 	default:
-		err = fmt.Errorf("unable to ")
+		err = fmt.Errorf("scheme '%v' of file '%v' not recognized", parsedURL.Scheme, parsedURL)
 	}
 
 	return content, err
@@ -116,7 +112,7 @@ func downloadFile(url string) (string, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("error getting the file")
+		return "", fmt.Errorf("download error, status code: '%v' when downloading file '%v'", resp.StatusCode, url)
 	}
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -155,14 +151,13 @@ func joinPaths(first string, second string) string {
 	return result
 }
 
-func setWorkdir() {
-	if workDir != "" {
-		err := os.Chdir(workDir)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		wd, _ := os.Getwd()
-		fmt.Printf("Working directory set to: %v\n", wd)
+func logResult(err error) {
+	if err != nil {
+		problems.WriteString(fmt.Sprintln(err))
+		fmt.Print("x")
+		return
 	}
+
+	fmt.Print(".")
+	return
 }
