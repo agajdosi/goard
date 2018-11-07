@@ -1,11 +1,13 @@
+# Example shows checks of OpenShift templates used in addons of Minishift.
+# To run the example, follow these steps:
+#  1. clone Minishift repository somewhere handy: "git clone https://github.com/minishift/minishift.git"
+#  2. run Goard: go run *.go -work-dir=$GOPATH -config-path $GOPATH/src/github.com/agajdosi/goard/examples/minishift-addons.yaml
+
 directories:
-# TO TRY: go run *.go -work-dir=$GOPATH -config-path $GOPATH/src/github.com/agajdosi/goard/test/addons.yaml
-# eap-cd addon
-- dir:
+- dir: # check eap-cd addon
   - src/github.com/minishift/minishift-addons/add-ons/eap-cd/templates
   - https://raw.githubusercontent.com/jboss-container-images/jboss-eap-7-openshift-image/eap-cd/templates
-# xpaas addon
-- dir:
+- dir: # check xpaas addon
   - src/github.com/minishift/minishift/addons/xpaas/v3.10/xpaas-templates
   - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.10/roles/openshift_examples/files/examples/v3.10/xpaas-templates
 - dir:

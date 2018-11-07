@@ -1,0 +1,38 @@
+[[goard]]
+= Goard
+:icons:
+:toc: macro
+:toc-title:
+:toclevels: 1
+
+toc::[]
+
+[[about]]
+== About Goard
+
+Goard is CLI tool which checks whether files in one location are the same as files in other location.
+Goard thus can be used to secure that all adopted (copied) files in your repository are up-to-date.
+If not and any changes in the remote repository was done, Goard will let you know.
+
+[[getting-started]]
+== Getting started
+
+=== Install Goard
+
+Before you start make sure you have recent version (v1.10+) of Go language installed.
+To install Goard then simply run:
+
+```
+go get -u github.com/agajdosi/goard
+```
+
+=== Use Goard
+
+Structure of what and how Goard will check up-to-dateness of files is defined in a YAML config.
+To get better idea about possibilities, please check examples in `example` directory.
+
+Simple Goard test then can be triggered with this command:
+
+```
+goard -work-dir=$GOPATH -config-path $GOPATH/src/github.com/agajdosi/goard/examples/minishift-addons.yaml
+```
