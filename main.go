@@ -21,34 +21,44 @@ func main() {
 	setWorkdir()
 	config.getConf(configPath)
 
-	fmt.Print("Checking individualy defined files")
-	for _, file := range config.Files {
-		checkFiles(file.This, file.That)
+	if config.Files != nil {
+		fmt.Print("Checking individualy defined files: ")
+		for _, file := range config.Files {
+			checkFiles(file.This, file.That)
+		}
+		fmt.Println(" DONE")
 	}
 
-	fmt.Print("\nChecking files at remote places")
-	for _, dir := range config.Locations {
-		for _, file := range dir.Files {
-			this := joinPaths(dir.Location[0], file)
-			that := joinPaths(dir.Location[1], file)
-			checkFiles(this, that)
-		}
-	}
-
-	fmt.Print("\nChecking files in local directories")
-	for _, directory := range config.Directories {
-		contents, err := ioutil.ReadDir(directory.Dir[0])
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, content := range contents {
-			if content.IsDir() {
-				continue
+	if config.Locations != nil {
+		fmt.Print("Checking files at remote places: ")
+		for _, dir := range config.Locations {
+			for _, file := range dir.Files {
+				this := joinPaths(dir.Location[0], file)
+				that := joinPaths(dir.Location[1], file)
+				checkFiles(this, that)
 			}
-			this := joinPaths(directory.Dir[0], content.Name())
-			that := joinPaths(directory.Dir[1], content.Name())
-			checkFiles(this, that)
+			fmt.Println(" DONE")
 		}
+	}
+
+	if config.Directories != nil {
+		fmt.Print("Checking files in local directories: ")
+		for _, directory := range config.Directories {
+			fmt.Printf("\n - %v: ", directory.Dir[0])
+			contents, err := ioutil.ReadDir(directory.Dir[0])
+			if err != nil {
+				log.Fatal(err)
+			}
+			for _, content := range contents {
+				if content.IsDir() {
+					continue
+				}
+				this := joinPaths(directory.Dir[0], content.Name())
+				that := joinPaths(directory.Dir[1], content.Name())
+				checkFiles(this, that)
+			}
+		}
+		fmt.Println(" DONE")
 	}
 
 	fmt.Println("\nAll checks finished")
