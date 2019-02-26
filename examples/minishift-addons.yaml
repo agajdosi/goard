@@ -7,7 +7,16 @@ directories:
 - dir: # check eap-cd addon
   - src/github.com/minishift/minishift-addons/add-ons/eap-cd/templates
   - https://raw.githubusercontent.com/jboss-container-images/jboss-eap-7-openshift-image/eap-cd/templates
+- dir:
+  - src/github.com/minishift/minishift-addons/add-ons/eap-cd/imagestream
+  - https://raw.githubusercontent.com/jboss-container-images/jboss-eap-7-openshift-image/eap-cd/templates
 - dir: # check xpaas addon
+  - src/github.com/minishift/minishift/addons/xpaas/v3.11/xpaas-templates
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.11/roles/openshift_examples/files/examples/x86_64/xpaas-templates
+- dir:
+  - src/github.com/minishift/minishift/addons/xpaas/v3.11/xpaas-streams
+  - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.11/roles/openshift_examples/files/examples/x86_64/xpaas-streams
+- dir:
   - src/github.com/minishift/minishift/addons/xpaas/v3.10/xpaas-templates
   - https://raw.githubusercontent.com/openshift/openshift-ansible/release-3.10/roles/openshift_examples/files/examples/v3.10/xpaas-templates
 - dir:

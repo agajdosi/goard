@@ -12,7 +12,7 @@ toc::[]
 
 Goard is CLI tool which checks whether files in one location are the same as files in other location.
 Goard thus can be used to secure that all adopted (copied) files in your repository are up-to-date.
-If not and any changes in the remote repository was done, Goard will let you know.
+If they are not and any changes in the remote repository were done, Goard will let you know.
 
 [[getting-started]]
 == Getting started
