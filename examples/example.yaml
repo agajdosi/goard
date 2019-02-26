@@ -1,0 +1,67 @@
+# Example shows checks of OpenShift templates used in addons of Minishift.
+# To run the example, run command:
+# >> go run *.go -config-path examples/example.yaml
+
+# Files structure can be used to compare two individualy defined files.
+# Any of the two can be local file or file accessible via URL address.
+files:
+  # compares two local files
+- this: examples/my-repo/template1
+  that: examples/origin-repo/template1
+  # compares local file with remote file
+- this: examples/my-repo/template2
+  that: https://raw.githubusercontent.com/agajdosi/goard/master/examples/origin-repo/template2
+  # compares remote file with local file
+- this: https://raw.githubusercontent.com/agajdosi/goard/master/examples/origin-repo/template3
+  that: examples/origin-repo/template3
+  # compares two remote files
+- this: https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo/template3
+  that: https://raw.githubusercontent.com/agajdosi/goard/master/examples/origin-repo/template3
+
+# Directories structure can be used to compare all files from directory with local or remote directory location.
+# First location has to be local as Goard will get list of all files in the directory automatically (cannot be done
+# via URL) and will then compare those with files at remote location.
+directories:
+  # checks whether all files in local directory are the same as the identically named files in another local directory.
+- dir:
+  - examples/my-repo
+  - examples/origin-repo
+  # checks whether all files in local directory are the same as the identically named files in remote directory
+- dir:
+  - examples/my-repo
+  - https://raw.githubusercontent.com/agajdosi/goard/master/examples/origin-repo
+
+# Locations structure can be used to compare local or remote directories using explicit list of files.
+locations:
+  # checks 2 local directories whether 3 explicitly listed files are the same at these directories
+- location:
+  - examples/my-repo
+  - examples/origin-repo
+  files:
+  - template1
+  - template2
+  - template3
+  # checks local and remote directories whether 3 explicitly listed files are the same at these directories
+- location:
+  - examples/my-repo
+  - https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo
+  files:
+  - template1
+  - template2
+  - template3
+    # checks remote and local directories whether 3 explicitly listed files are the same at these directories
+- location:
+  - https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo
+  - examples/my-repo
+  files:
+  - template1
+  - template2
+  - template3
+  # checks 2 remote directories whether 3 explicitly listed files are the same at these directories
+- location:
+  - https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo
+  - https://raw.githubusercontent.com/agajdosi/goard/master/examples/origin-repo
+  files:
+  - template1
+  - template2
+  - template3
