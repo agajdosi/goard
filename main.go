@@ -29,32 +29,29 @@ func main() {
 		fmt.Println(" DONE")
 	}
 
-	if config.Locations != nil {
-		fmt.Print("Checking files at remote places: ")
-		for _, dir := range config.Locations {
-			for _, file := range dir.Files {
-				this := joinPaths(dir.Location[0], file)
-				that := joinPaths(dir.Location[1], file)
-				checkFiles(this, that)
-			}
-			fmt.Println(" DONE")
-		}
-	}
-
 	if config.Directories != nil {
-		fmt.Print("Checking files in local directories: ")
+		fmt.Print("Checking files in directories: ")
 		for _, directory := range config.Directories {
 			fmt.Printf("\n - %v: ", directory.Dir[0])
-			contents, err := ioutil.ReadDir(directory.Dir[0])
-			if err != nil {
-				log.Fatal(err)
-			}
-			for _, content := range contents {
-				if content.IsDir() {
-					continue
+
+			if directory.Files == nil {
+				var err error
+				contents, err := ioutil.ReadDir(directory.Dir[0])
+				if err != nil {
+					log.Fatal(err)
 				}
-				this := joinPaths(directory.Dir[0], content.Name())
-				that := joinPaths(directory.Dir[1], content.Name())
+
+				for _, content := range contents {
+					if content.IsDir() {
+						continue
+					}
+					directory.Files = append(directory.Files, content.Name())
+				}
+			}
+
+			for _, file := range directory.Files {
+				this := joinPaths(directory.Dir[0], file)
+				that := joinPaths(directory.Dir[1], file)
 				checkFiles(this, that)
 			}
 		}

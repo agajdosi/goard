@@ -11,13 +11,9 @@ import (
 
 type conf struct {
 	Directories []struct {
-		Dir []string `yaml:"dir"`
+		Dir   []string `yaml:"dir"`
+		Files []string `yaml:"files"`
 	} `yaml:"directories"`
-
-	Locations []struct {
-		Location []string `yaml:"location"`
-		Files    []string `yaml:"files"`
-	}
 
 	Files []struct {
 		This string `yaml:"this"`
