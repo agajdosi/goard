@@ -21,42 +21,8 @@ func main() {
 	setWorkdir()
 	config.getConf(configPath)
 
-	if config.Files != nil {
-		fmt.Print("Checking individualy defined files: ")
-		for _, file := range config.Files {
-			checkFiles(file.This, file.That)
-		}
-		fmt.Println(" DONE")
-	}
-
-	if config.Directories != nil {
-		fmt.Print("Checking files in directories: ")
-		for _, directory := range config.Directories {
-			fmt.Printf("\n - %v: ", directory.Dir[0])
-
-			if directory.Files == nil {
-				var err error
-				contents, err := ioutil.ReadDir(directory.Dir[0])
-				if err != nil {
-					log.Fatal(err)
-				}
-
-				for _, content := range contents {
-					if content.IsDir() {
-						continue
-					}
-					directory.Files = append(directory.Files, content.Name())
-				}
-			}
-
-			for _, file := range directory.Files {
-				this := joinPaths(directory.Dir[0], file)
-				that := joinPaths(directory.Dir[1], file)
-				checkFiles(this, that)
-			}
-		}
-		fmt.Println(" DONE")
-	}
+	checkFiles()
+	checkDirectories()
 
 	fmt.Println("\nAll checks finished")
 	if problems.Len() > 0 {
@@ -69,7 +35,72 @@ func main() {
 	os.Exit(0)
 }
 
-func checkFiles(pathOne, pathTwo string) {
+func checkFiles() {
+	if config.Files == nil {
+		return
+	}
+
+	fmt.Print("Checking individualy defined files: ")
+	for _, file := range config.Files {
+		compareFiles(file.This, file.That)
+	}
+	fmt.Println(" DONE")
+}
+
+func checkDirectories() {
+	if config.Directories == nil {
+		return
+	}
+
+	fmt.Print("Checking files in directories: ")
+	for _, directory := range config.Directories {
+		fmt.Printf("\n - %v: ", directory.Dir[0])
+
+		if directory.Files == nil {
+			var err error
+			contents, err := ioutil.ReadDir(directory.Dir[0])
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for _, content := range contents {
+				if content.IsDir() {
+					continue
+				}
+				directory.Files = append(directory.Files, content.Name())
+			}
+		}
+
+		for _, file := range directory.Files {
+			this := joinPaths(directory.Dir[0], file)
+			that := joinPaths(directory.Dir[1], file)
+			compareFiles(this, that)
+		}
+	}
+	fmt.Println(" DONE")
+}
+
+func joinPaths(first string, second string) string {
+	var result string
+	firstURL, err := url.Parse(first)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	switch firstURL.Scheme {
+	case "http", "https":
+		firstURL.Path = path.Join(firstURL.Path, second)
+		result = firstURL.String()
+	case "", "file":
+		result = path.Join(first, second)
+	default:
+		log.Fatalf("unable to match the path '%v' to http(s):// or file:// schemes", first)
+	}
+
+	return result
+}
+
+func compareFiles(pathOne, pathTwo string) {
 	first, err := getFile(pathOne)
 	if err != nil {
 		logResult(err)
@@ -83,7 +114,7 @@ func checkFiles(pathOne, pathTwo string) {
 	}
 
 	if first != second {
-		err := fmt.Errorf("mismatch, file '%v' is not the same as file '%v'", pathOne, pathTwo)
+		err := fmt.Errorf("mismatch: file '%v' is not the same as file '%v'", pathOne, pathTwo)
 		logResult(err)
 		return
 	}
@@ -130,41 +161,10 @@ func downloadFile(url string) (string, error) {
 }
 
 func readFile(path string) (string, error) {
-	remoteFile, err := ioutil.ReadFile(path)
+	file, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
 	}
 
-	return string(remoteFile), nil
-}
-
-func joinPaths(first string, second string) string {
-	var result string
-	firstURL, err := url.Parse(first)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	switch firstURL.Scheme {
-	case "http", "https":
-		firstURL.Path = path.Join(firstURL.Path, second)
-		result = firstURL.String()
-	case "", "file":
-		result = path.Join(first, second)
-	default:
-		log.Fatalf("unable to match the path '%v' to http(s):// or file:// schemes", first)
-	}
-
-	return result
-}
-
-func logResult(err error) {
-	if err != nil {
-		problems.WriteString(fmt.Sprintln(err))
-		fmt.Print("x")
-		return
-	}
-
-	fmt.Print(".")
-	return
+	return string(file), nil
 }

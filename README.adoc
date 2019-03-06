@@ -14,6 +14,9 @@ Goard is CLI tool which checks whether files in one location are the same as fil
 Goard thus can be used to secure that all adopted (copied) files in your repository are up-to-date.
 If they are not and any changes in the remote repository were done, Goard will let you know.
 
+If you have your repository full of files taken from remote sources and you want to easily make sure
+that these are up-to-date, Goard is here for you!
+
 [[getting-started]]
 == Getting started
 
@@ -26,13 +29,44 @@ To install Goard then simply run:
 go get -u github.com/agajdosi/goard
 ```
 
-=== Use Goard
+=== Try examples
 
-Structure of what and how Goard will check up-to-dateness of files is defined in a YAML config.
-To get better idea about possibilities, please check examples in `example` directory.
-
-Simple Goard test then can be triggered with this command:
+To run the basic Goard example, run the following commands:
 
 ```
-goard -work-dir=$GOPATH -config-path $GOPATH/src/github.com/agajdosi/goard/examples/minishift-addons.yaml
+$ cd <path-to-goard-repository>
+$ goard --config-path examples/basic.yaml
+```
+
+=== Use Goard
+
+==== Create your config file
+
+Goard uses Yaml config files to define which files and directories should be checked.
+To start using Goard in your repository first create Yaml config, lets name it for example: `my.yaml`. 
+
+Goard provides two approaches for defining the checks:
+
+- defining by pairs of files, one by one:
+```
+files:
+- this: examples/my-repo/template1
+  that: https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo/template1
+- this: examples/my-repo/template2
+  that: https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo/template2
+```
+
+- or defining by whole directories:
+```
+directories:
+- dir:
+  - examples/my-repo
+  - https://raw.githubusercontent.com/agajdosi/goard/master/examples/my-repo
+```
+
+==== Run the checks
+
+To start the checks with newly created config simply aim the Goard to it and run it:
+```
+goard --config-path <path-to-config>/my.yaml
 ```
